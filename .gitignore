@@ -1,0 +1,14 @@
+# Ignore node_modules directory
+node_modules/
+
+# Ignore package-lock.json (optional, but usually best to avoid)
+package-lock.json
+
+# Ignore macOS system files
+.DS_Store
+
+# Log files
+*.log
+
+# Environment variables file 
+.env

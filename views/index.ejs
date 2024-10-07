@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Airport Lounge Search</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+      .custom-shape-divider-bottom-1728164869 {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        overflow: hidden;
+        line-height: 0;
+      }
+
+      .custom-shape-divider-bottom-1728164869 svg {
+        position: relative;
+        display: block;
+        width: calc(100% + 1.3px);
+        height: 250px;
+        transform: rotateY(180deg);
+      }
+
+      .custom-shape-divider-bottom-1728164869 .shape-fill {
+        fill: #f2f2eb;
+      }
+      body {
+        position: relative;
+        min-height: 100vh;
+        padding-bottom: 150px;
+        background: linear-gradient(to right, #00498f, #002173);
+        color: #fff;
+      }
+      label,
+      h1,
+      .navbar {
+        color: white;
+      }
+
+      .navbar-light .navbar-brand,
+      .navbar-light .nav-link {
+        color: white !important;
+      }
+      .btn-custom {
+        background-color: #f2f2eb;
+        color: black;
+        border: none;
+      }
+
+      .btn-custom:hover {
+        background-color: #e0e0e0;
+      }
+      #airportInput {
+        width: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-light bg-light"
+      style="background-color: rgba(0, 0, 0, 0.5) !important"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Lounges</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-5">
+      <h1>Explore Lounges</h1>
+      <div class="mb-3">
+        <label for="airportInput" class="form-label"></label>
+        <input
+          type="text"
+          class="form-control"
+          id="airportInput"
+          placeholder="Enter Airport Name (e.g., Los Angeles International Airport)"
+        />
+      </div>
+      <button class="btn btn-custom" onclick="fetchLounges()">
+        Search Lounges
+      </button>
+      <div id="results" class="mt-4">
+        <pre id="loungeResults"></pre>
+      </div>
+    </div>
+    <div class="custom-shape-divider-bottom-1728164869">
+      <svg
+        data-name="Layer 1"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 1200 120"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z"
+          class="shape-fill"
+        ></path>
+      </svg>
+    </div>
+
+    <script>
+      async function fetchLounges() {
+        const airportName = document.getElementById("airportInput").value;
+        if (!airportName) {
+          alert("Please enter an airport name!");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `/api/lounges?airport=${encodeURIComponent(airportName)}`
+          );
+          const data = await response.json();
+          const resultsContainer = document.getElementById("loungeResults");
+          resultsContainer.textContent = "";
+          if (data.results && data.results.length > 0) {
+            data.results.forEach((lounge) => {
+              const name = lounge.name || "Unknown Lounge";
+              const address = lounge.formatted_address || "Unknown Address";
+              const isOpen =
+                lounge.opening_hours && lounge.opening_hours.open_now
+                  ? "Open"
+                  : "Closed";
+              const loungeLine = `${name} - ${address} (${isOpen})`;
+              const resultElement = document.createElement("p");
+              resultElement.textContent = loungeLine;
+              resultsContainer.appendChild(resultElement);
+            });
+          } else {
+            resultsContainer.textContent = "No lounges found for this airport.";
+          }
+        } catch (error) {
+          document.getElementById("loungeResults").textContent =
+            "Error fetching lounge data.";
+        }
+      }
+    </script>
+  </body>
+</html>
